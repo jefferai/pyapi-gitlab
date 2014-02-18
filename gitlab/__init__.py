@@ -14,7 +14,7 @@ class Gitlab(object):
     """
     Gitlab class
     """
-    def __init__(self, host, token="", verify_ssl=True):
+    def __init__(self, host, token="", ssl=False, verify_ssl=True):
         """
         on init we setup the token used for all the api calls and all the urls
         :param host: host of gitlab
@@ -27,8 +27,12 @@ class Gitlab(object):
             self.host = host[:-1]
         else:
             self.host = host
-        if self.host[:7] != 'http://':
-            self.host = 'http://' + self.host
+
+        if self.host[:7] != 'http://' and self.host[:8] != 'https://':
+            if ssl:
+                self.host = 'https://' + self.host
+            else:
+                self.host = 'http://' + self.host
 
         self.api_url = self.host + "/api/v3"
         self.projects_url = self.api_url + "/projects"
