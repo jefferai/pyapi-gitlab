@@ -4,6 +4,7 @@ pyapi-gitlab, a gitlab python wrapper for the gitlab API
 by Itxaka Serrano Garcia <itxakaserrano@gmail.com>
 """
 
+import copy
 import requests
 import json
 import markdown
@@ -139,14 +140,19 @@ class Gitlab(object):
             
             return False
 
-    def currentuser(self):
+    def currentuser(self, sudo=""):
         """
         Returns the current user parameters. The current user is linked
         to the secret token
         :return: a list with the current user properties
         """
+        headers = self.headers
+        if sudo != "":
+            headers = copy.deepcopy(self.headers)
+            headers["SUDO"] = sudo
+
         request = requests.get(self.host + "/api/v3/user",
-                               headers=self.headers, verify=self.verify_ssl)
+                               headers=headers, verify=self.verify_ssl)
         return json.loads(request.content.decode("utf-8"))
 
     def edituser(self, id_,
@@ -216,12 +222,17 @@ class Gitlab(object):
         else:
             return False
 
-    def getsshkeys(self):
+    def getsshkeys(self, sudo=""):
         """
         Gets all the ssh keys for the current user
         :return: a dictionary with the lists
         """
-        request = requests.get(self.keys_url, headers=self.headers,
+        headers = self.headers
+        if sudo != "":
+            headers = copy.deepcopy(self.headers)
+            headers["SUDO"] = sudo
+
+        request = requests.get(self.keys_url, headers=headers,
                                verify=self.verify_ssl)
         if request.status_code == 200:
             return json.loads(request.content.decode("utf-8"))
@@ -229,14 +240,19 @@ class Gitlab(object):
             
             return False
 
-    def getsshkey(self, id_):
+    def getsshkey(self, id_, sudo=""):
         """
         Get a single ssh key identified by id_
         :param id_: the id of the key
         :return: the key itself
         """
+        headers = self.headers
+        if sudo != "":
+            headers = copy.deepcopy(self.headers)
+            headers["SUDO"] = sudo
+
         request = requests.get(self.keys_url + "/" + str(id_),
-                               headers=self.headers, verify=self.verify_ssl)
+                               headers=headers, verify=self.verify_ssl)
         if request.status_code == 200:
             return json.loads(request.content.decode("utf-8"))
         else:
@@ -282,14 +298,19 @@ class Gitlab(object):
             
             return False
 
-    def deletesshkey(self, id_):
+    def deletesshkey(self, id_, sudo=""):
         """
         Deletes an sshkey for the current user identified by id
         :param id_: the id of the key
         :return: False if it didn't delete it, True if it was deleted
         """
+        headers = self.headers
+        if sudo != "":
+            headers = copy.deepcopy(self.headers)
+            headers["SUDO"] = sudo
+
         request = requests.delete(self.keys_url + "/" + str(id_),
-                                  headers=self.headers)
+                                  headers=headers)
         if request.content == "null":
             
             return False
