@@ -1420,14 +1420,15 @@ class Gitlab(object):
         :param sudo: do the request with another user
         :return: True if success
         """
-        if access_level.lower() == "master":
-            access_level = 40
-        elif access_level.lower() == "developer":
-            access_level = 30
-        elif access_level.lower() == "reporter":
-            access_level = 20
-        else:
-            access_level = 10
+        if type(access_level) is str:
+            if access_level.lower() == "master":
+                access_level = 40
+            elif access_level.lower() == "developer":
+                access_level = 30
+            elif access_level.lower() == "reporter":
+                access_level = 20
+            else:
+                access_level = 10
         data = {"id": group_id, "user_id": user_id, "access_level": access_level}
         if sudo != "":
             data['sudo'] = sudo
